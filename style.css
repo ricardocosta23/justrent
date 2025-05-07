@@ -1,0 +1,43 @@
+/* Custom styles to complement Bootstrap */
+body {
+    background-color: #f8f9fa;
+    padding-bottom: 2rem;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: var(--bs-primary);
+    color: white;
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+    padding: 1rem;
+}
+
+.alert {
+    margin-bottom: 1.5rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Ensure buttons have adequate padding */
+.btn {
+    padding: 0.5rem 1rem;
+}
+
+/* Additional spacing for form elements */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Make the input and textarea look consistent */
+.form-control {
+    padding: 0.625rem;
+}

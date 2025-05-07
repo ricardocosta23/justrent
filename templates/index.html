@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Property Address</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 2rem;
+        }
+        
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background-color: var(--bs-primary);
+            color: white;
+            border-top-left-radius: 0.5rem !important;
+            border-top-right-radius: 0.5rem !important;
+            padding: 1rem;
+        }
+        
+        .alert {
+            margin-bottom: 1.5rem;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* Ensure buttons have adequate padding */
+        .btn {
+            padding: 0.5rem 1rem;
+        }
+        
+        /* Additional spacing for form elements */
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Make the input and textarea look consistent */
+        .form-control {
+            padding: 0.625rem;
+        }
+        
+        .table-container {
+            margin-top: 2rem;
+        }
+        
+        .property-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .property-table th,
+        .property-table td {
+            padding: 0.75rem;
+            vertical-align: top;
+        }
+        
+        .address-cell {
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .clickable-row {
+            cursor: pointer;
+        }
+        
+        .clickable-row:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Property Address Management</h1>
+        
+        <div class="row">
+            <!-- Update Form Column -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">Update Property Address</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if error_message %}
+                            <div class="alert alert-danger">
+                                {{ error_message }}
+                            </div>
+                        {% endif %}
+                        
+                        {% if success_message %}
+                            <div class="alert alert-success">
+                                {{ success_message }}
+                            </div>
+                        {% endif %}
+                        
+                        <form method="post" action="{{ url_for('index') }}">
+                            <div class="mb-3">
+                                <label for="id" class="form-label">Property ID:</label>
+                                <input type="number" class="form-control" id="id" name="id" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="address" class="form-label">New Address:</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Update Address</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Properties List Column -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">Property List</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Click on a property to fill the form automatically</p>
+                        
+                        {% if properties %}
+                            <div class="table-responsive">
+                                <table class="table table-striped property-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Current Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for property in properties %}
+                                            <tr class="clickable-row" data-id="{{ property.id }}" data-address="{{ property.address }}">
+                                                <td>{{ property.id }}</td>
+                                                <td class="address-cell">{{ property.address }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                No properties found in the database.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const idField = document.getElementById('id');
+            const addressField = document.getElementById('address');
+            
+            if (idField.value.trim() === '' || addressField.value.trim() === '') {
+                e.preventDefault();
+                alert('Both ID and address fields are required.');
+            }
+        });
+        
+        // Click on property row to fill the form
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const address = this.getAttribute('data-address');
+                
+                document.getElementById('id').value = id;
+                document.getElementById('address').value = address;
+                
+                // Scroll to the form
+                document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
