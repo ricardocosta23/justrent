@@ -132,6 +132,12 @@
                     <div class="card-body">
                         <p class="text-muted">Click on a property to fill the form automatically</p>
                         
+                        {% if error_message %}
+                            <div class="alert alert-danger">
+                                {{ error_message }}
+                            </div>
+                        {% endif %}
+                        
                         {% if properties %}
                             <div class="table-responsive">
                                 <table class="table table-striped property-table">

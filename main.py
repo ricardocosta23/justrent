@@ -15,13 +15,22 @@ DB_NAME = os.environ.get("DB_NAME", "jrm_db")
 
 # Determine which database to use based on environment
 # If running locally or in development without MySQL access, use SQLite
-if os.environ.get("VERCEL_ENV") or os.environ.get("USE_MYSQL", "0") == "1":
-    # In production (on Vercel or when explicitly requesting MySQL)
-    encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{DB_USER}:{encoded_password}@{DB_HOST}/{DB_NAME}"
-else:
-    # For local development in Replit, use SQLite
+try:
+    if os.environ.get("VERCEL_ENV") or os.environ.get("USE_MYSQL", "0") == "1":
+        # In production (on Vercel or when explicitly requesting MySQL)
+        encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
+        mysql_uri = f"mysql+pymysql://{DB_USER}:{encoded_password}@{DB_HOST}/{DB_NAME}"
+        app.config["SQLALCHEMY_DATABASE_URI"] = mysql_uri
+        print(f"Configured MySQL connection to {DB_HOST}/{DB_NAME} with user {DB_USER}")
+    else:
+        # For local development in Replit, use SQLite
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///property_database.db"
+        print("Using SQLite database for local development")
+except Exception as e:
+    print(f"Error configuring database connection: {str(e)}")
+    # Fallback to SQLite in case of configuration error
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///property_database.db"
+    print("Falling back to SQLite due to configuration error")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize SQLAlchemy
@@ -54,6 +63,7 @@ def create_sample_data():
 def index():
     error_message = ""
     success_message = ""
+    properties = []
     
     if request.method == 'POST':
         property_id = request.form.get('id')
@@ -81,9 +91,15 @@ def index():
                 error_message = "ID must be a valid integer."
             except Exception as e:
                 error_message = f"Database error: {str(e)}"
+                print(f"Error in POST handler: {str(e)}")
     
-    # Fetch all properties to display in a table
-    properties = Property.query.all()
+    # Fetch all properties to display in a table with error handling
+    try:
+        properties = Property.query.all()
+        print(f"Retrieved {len(properties)} properties from the database")
+    except Exception as e:
+        error_message = f"Failed to load properties: {str(e)}"
+        print(f"Error fetching properties: {str(e)}")
     
     return render_template('index.html', 
                          error_message=error_message, 
